@@ -1,0 +1,9 @@
+[submodule "app/misc/lualib-src/luafilesystem"]
+	path = app/misc/lualib-src/luafilesystem
+	url = https://github.com/keplerproject/luafilesystem
+[submodule "app/misc/lualib-src/lua-protobuf"]
+	path = app/misc/lualib-src/lua-protobuf
+	url = https://github.com/starwing/lua-protobuf
+[submodule "app/misc/lualib-src/luasql"]
+	path = app/misc/lualib-src/luasql
+	url = https://github.com/keplerproject/luasql
