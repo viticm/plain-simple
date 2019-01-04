@@ -10,18 +10,10 @@
 # limitations under the License.
 cmake_minimum_required(VERSION 2.8.12)
 
-set_compiler_flags_for_external_libraries()
-restore_compiler_flags()
-
-set(gtest_incdir ${dependencies_gtest_dir}/include)
-if(EXISTS "${dependencies_gtest_dir}/../../third_party")
-  set(gtest_hack_incdir "${dependencies_gtest_dir}/../..")
-endif()
-set(gtest_libdir ${dependencies_gtest_dir})
-
+#set_compiler_flags_for_external_libraries()
+#restore_compiler_flags()
 
 # Include helper functions and macros used by Google Test.
-include(${gtest_libdir}/cmake/internal_utils.cmake)
 config_compiler_and_linker()
 string(REPLACE "-W4" "-W3" cxx_default "${cxx_default}")
 string(REPLACE "-Wshadow" "" cxx_default "${cxx_default}")
@@ -32,8 +24,7 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(${gtest_incdir}
                     ${gtest_hack_incdir}
-                    ${plainframework_dir}/include/
-                    ${root_dir}/plain/app/include/
+                    ${root_dir}/app/include/
                     ${CMAKE_CURRENT_LIST_DIR})
 
 # Common libraries for tests.
