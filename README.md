@@ -3,7 +3,7 @@
 ## A project with plain framework, tech you quick start. ##
 
 It's a light game project implement with lua script, now it has the login and enter.
-If you want other code language use plain framework, just few minutes tutorial.
+If you want other code language use plain framework, just read few minutes tutorial.
 
 **This project have three application:**
 
