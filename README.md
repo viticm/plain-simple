@@ -38,6 +38,9 @@ name=client
 
 engine.frame=100;
 
+;Because the client need lua script, then need set the script is open and set
+;the type is 0, and set the script path.
+
 script.open=1;                                ;If enable the script.
 script.type=0;                                ;0 is lua, other can use plugin register.
 script.heartbeat=heartbeat;
@@ -56,5 +59,7 @@ count=1;                       The plugin count.
 ;The client connection for net.
 [client]
 
+;Because client need connect to server, and the connection name must empty before logic server routing
+;set, so set usercount is 3 for self connect to gateway.
 usercount=3;            The client connect by user count.
 ```
