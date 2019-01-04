@@ -16,5 +16,4 @@ If you want other code language use plain framework, just read few minutes tutor
 **This project connection model:**
 
 `=>`means connect to, `<-`means be connected.
-
-| `client`=>`gateway`<=logic | `client`<-`gateway`->`logic` |
+| `client` => `gateway` <= `logic` | `client` <- `gateway` -> `logic` |
