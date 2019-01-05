@@ -38,8 +38,10 @@ name=client
 
 engine.frame=100;
 
-;Because the client need lua script, then need set the script is open and set
-;the type is 0, and set the script path.
+-------------------------------------------------------------------------------
+* Because the client need lua script, then need set the script is open and set
+the type is 0, and set the script path.
+-------------------------------------------------------------------------------
 
 script.open=1;                                ;If enable the script.
 script.type=0;                                ;0 is lua, other can use plugin register.
@@ -59,8 +61,12 @@ count=1;                       The plugin count.
 ;The client connection for net.
 [client]
 
-;Because client need connect to server, and the connection name must empty before logic server routing
-;set, so set usercount is 3 for self connect to gateway.
+-------------------------------------------------------------------------------
+* Because client need connect to server, and the connection name must empty 
+before logic server routing set, so set usercount is 3 for self connect to 
+gateway.
+-------------------------------------------------------------------------------
+
 usercount=3;            The client connect by user count.
 ```
 
@@ -81,10 +87,19 @@ name=gateway
 
 engine.frame=100;
 
+-------------------------------------------------------------------------------
+* The default net is service for client, set the port is 2333 and max 2048.
+-------------------------------------------------------------------------------
+
 net.open=1;                                   ;If enable the net.
 net.service=1;                                ;If default net is service.
 net.port=2333;                                ;The default net listen port.
 net.connmax=2048;                             ;The net max connections.
+
+-------------------------------------------------------------------------------
+* Because the gateway need lua script, then need set the script is open and set
+the type is 0, and set the script path.
+-------------------------------------------------------------------------------
 
 script.open=1;                                ;If enable the script.
 script.type=0;                                ;0 is lua, other can use plugin register.
@@ -106,10 +121,72 @@ count=1;                       The plugin count.
 
 count=1;                The server count.
 
+-------------------------------------------------------------------------------
+* The extra service for logic server, set the name is server_service and 20 max,
+the listen port is 2555.
+-------------------------------------------------------------------------------
+
 name0=server_service;   The server 1 name.
 ip0=0.0.0.0;            Listen ip.
 port0=2555;             Listen port.
 connmax0=20;            Allow the client connections count.
 encrypt0=ac;            The encrypt string not empty then connect this server need handshake.
+scriptfunc0="";         The network handle script function.
+```
+
+### logic ###
+
+The logic server use lua script and service for player game world.
+
+```ini
+;The env config will set in framework globals, just like: section.key=value
+;cn: 环境变量的配置会设置到框架的全局变量中，格式为：段名.字段名=值
+
+;The application settings.
+[app]
+name=logic
+
+;The default setings.
+[default]
+
+engine.frame=100;
+
+-------------------------------------------------------------------------------
+* Because the logic need lua script, then need set the script is open and set
+the type is 0, and set the script path.
+-------------------------------------------------------------------------------
+
+script.open=1;                                ;If enable the script.
+script.type=0;                                ;0 is lua, other can use plugin register.
+;script.heartbeat=heartbeat;
+script.rootpath=public/data/logic/script
+
+
+;The plugins.
+;The plugin parameters mean-> plugin name : local | global(default local) : ... (
+;Other parameters for plugin with pf_plugin_open)
+[plugins]
+
+count=1;                       The plugin count.
+
+0=pf_plugin_lua:global:0;      The lua script plugin(The last value is the script env type).
+                               ;Load global symbols for all lua c so use the api.
+
+;The client connection for net.
+[client]
+
+-------------------------------------------------------------------------------
+* The one connection setting is to connect gateway, the connection name is 
+logic1 to gateway and self, the connect port is 2555 and ip is 127.0.0.1 .
+-------------------------------------------------------------------------------
+
+count=1;                The client count.
+usercount=0;            The client connect by user count.
+
+name0=logic1;           The client 1 name/this name will use in gateway.
+ip0=127.0.0.1;          The connect ip.
+port0=2555;             The connect port.
+encrypt0=ac;            The encrypt string not empty then connect the server will handshake.
+startup0=1;             Start or heartbeat the application if connect.
 scriptfunc0="";         The network handle script function.
 ```
