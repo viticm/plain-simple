@@ -231,6 +231,7 @@ return {
 **Client implement:**
 
 Client first create a connection to gateway, then request login and enter.
+
 File: `bin/public/data/client/script/main.lua`
 
 ```lua
@@ -248,6 +249,7 @@ File: `bin/public/data/client/script/main.lua`
 **Gateway implement:**
 
 Gateway need register the packet handler for client login and enter.
+
 File: `bin/public/data/gateway/script/handlers/login.lua`
 
 ```lua
@@ -296,6 +298,7 @@ end)
 **Logic implement:**
 
 Logic need register the gateway enter and the routing response handlers.
+
 File: `bin/public/data/logic/script/handlers/login.lua`
 
 ```lua
