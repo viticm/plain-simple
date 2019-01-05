@@ -202,3 +202,151 @@ The message will routing directly to logic when enter logic success.
 
 - Logic need check and load user data when gateway request enter, request gateway routing when enter success.
 The message will send client after routing success(need use routing interface).
+
+### Implement codes ###
+
+In this project network use google protocolbuf with lua script, some lua interface
+implement with plugin and other in lua script.
+
+**Protocol define:**
+
+```lua
+-- The script packet id must begin 20001.
+return {
+
+  test = {id = 0x4e21, proto = "test.pb_test"},
+
+  c2w_login = {id = 0x4e30, proto = "login.c2w_login"}, -- client request login gateway
+  c2w_enter = {id = 0x4e31, proto = "login.c2w_enter"}, -- client request enter logic world
+  w2l_enter = {id = 0x4e32, proto = "login.w2l_enter"}, -- gateway request enter logic world
+  l2w_enter = {id = 0x4e33, proto = "login.l2w_enter"}, -- logic response gateway enter result
+  l2c_enter = {id = 0x4e34, proto = "login.l2c_enter"}, -- logic response client enter result
+  c2l_test = {id = 0x4e35, proto = "login.c2l_test"},
+  c2l_test1 = {id = 0x4e36, proto = "login.c2l_test1"},
+  l2c_test2 = {id = 0x4e37, proto = "login.l2c_test2"},
+
+}
+```
+
+**Client implement:**
+
+Client first create a connection to gateway, then request login and enter.
+File: `bin/public/data/client/script/main.lua`
+
+```lua
+  connid = net.connect("", "127.0.0.1", 2333, true)
+  local msg = {
+    a = 111,
+    b = "test",
+    c = {1, 3, 5},
+  }
+  local r1 = net.pb_send("connector", connid, op.test, msg) -- This is a test msg.
+  local r2 = net.pb_send("connector", connid, op.c2w_login, {username = "test"})
+  local r3 = net.pb_send("connector", connid, op.c2w_enter, {username = "test", server = "logic1"})
+```
+
+**Gateway implement:**
+
+Gateway need register the packet handler for client login and enter.
+File: `bin/public/data/gateway/script/handlers/login.lua`
+
+```lua
+local op = require "pb_define"
+local dumptable = require("dumptable")
+
+local loginlist = loginlist or {}
+
+-- User login.
+net.reg_pbhandler(op.c2w_login, function(data, conn, original)
+  print(dumptable(data))
+  loginlist[data.username] = 1
+end)
+
+-- User enter.
+net.reg_pbhandler(op.c2w_enter, function(data, conn, original) 
+  print(dumptable(data))
+  local username = data.username
+  local server = data.server
+  local connid = conn
+  if not loginlist[username] then
+    assert(false, "c2w_enter user not login: "..username)
+    return
+  end
+  if type(connid) ~= "number" then
+    assert(false, "c2w_enter connection error")
+    return
+  end
+  local msg = {username = username, connid = connid}
+  print("w2l_enter...........")
+  print(dumptable(msg))
+  local r = net.pb_send("listener", server, op.w2l_enter, msg, "server_service")
+  if not r then
+    assert(false, "c2w_enter can't reach the server: "..server)
+  end
+end)
+
+-- Enter result.
+net.reg_pbhandler(op.l2w_enter, function(data, conn, original) 
+  print(dumptable(data))
+  if data.result ~= 0 then
+    net.disconnect(data.servicename, data.connid)
+  end
+end)
+```
+**Logic implement:**
+
+Logic need register the gateway enter and the routing response handlers.
+File: `bin/public/data/logic/script/handlers/login.lua`
+
+```lua
+local op = require "pb_define"
+local dumptable = require("dumptable")
+
+local userlist = userlist or {}
+
+-- The routing reached.
+net.reg_routing("logic1", function(aim_name, service) 
+  print("routing reached", aim_name, service)
+  local info = userlist[aim_name]
+  if info then
+    info.routing = {aim_name = aim_name, service = service}
+    if 1 == info.login then
+      local msg = {rolelist = {"aaa", "bbb", "ccc"}}
+      print(net.pb_send("connector", "logic1", op.l2c_enter, msg, nil, info.routing))
+    elseif 2 == info.login then -- Relogin.
+
+    end
+  end
+end)
+
+-- Enter.
+net.reg_pbhandler(op.w2l_enter, function(data, conn, original) 
+  print(dumptable(data))
+  local username = data.username
+  local connid = data.connid
+  local servicename = data.servicename
+  math.randomseed(os.time())
+  local result = 0 -- math.random(0, 1)
+  local rmsg = {result = result, connid = connid, servicename = servicename}
+  net.pb_send("connector", conn, op.l2w_enter, rmsg)
+  if 0 == result then
+    userlist[username] = {login = 1} -- First login.
+    net.routing_request("connector", conn, nil, servicename, username, connid)
+  end
+end)
+
+net.reg_pbhandler(op.c2l_test, function(data, conn, original) 
+  print(dumptable(data))
+  print("info: ", conn, original)
+end)
+
+net.reg_pbhandler(op.c2l_test1, function(data, conn, original) 
+  print(dumptable(data))
+  print("info1: ", conn, original)
+  local info = original and userlist[original]
+  if info and info.routing then
+    local msg = {a = 2333, b = 3.1415926, c = "l2c_test1"}
+    print(net.pb_send("connector", "logic1", op.l2c_test2, msg, nil, info.routing))
+  end
+end)
+```
