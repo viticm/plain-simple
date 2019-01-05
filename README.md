@@ -196,6 +196,9 @@ scriptfunc0="";         The network handle script function.
 **The process:**
 
 - Client try login to gateway server, after login try enter the logic.
+The message will routing directly to logic when enter logic success.
+
 - Gateway need check client login request, check login status when client enter logic.
+
 - Logic need check and load user data when gateway request enter, request gateway routing when enter success.
 The message will send client after routing success(need use routing interface).
