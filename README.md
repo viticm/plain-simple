@@ -19,6 +19,13 @@ If you want other code language use plain framework, just read few minutes tutor
 
 | `client` => `gateway` <= `logic` | `client` <- `gateway` -> `logic` |
 
+On Linux, use the command build and run, make sure installed plain framework and plugins:
+
+```shell
+git clone https://github.com/viticm/plain-simple && cd plain-simple
+cd cmake && cmake ./ && make
+```
+
 ## The applications environment config. ##
 
 ### client ###
