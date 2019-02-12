@@ -7,3 +7,6 @@
 [submodule "app/misc/lualib-src/luasql"]
 	path = app/misc/lualib-src/luasql
 	url = https://github.com/keplerproject/luasql
+[submodule "app/misc/lualib-src/luasocket"]
+	path = app/misc/lualib-src/luasocket
+	url = https://github.com/diegonehab/luasocket

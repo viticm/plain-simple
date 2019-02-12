@@ -1,3 +1,5 @@
+local redis = require("redis")
+
 function mytest()
   log.fast("mytest function is done: %d", os.time())
 end
@@ -48,3 +50,10 @@ function testpb()
   print(require "serpent".block(data2))
 
 end
+
+function test_redis()
+  local conn = redis.connect({host = "localhost"})
+  print("test_redis", conn)
+end
+
+test_redis()
