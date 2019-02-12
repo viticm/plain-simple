@@ -19,7 +19,7 @@ function main()
   loadconfig()
   g_system_timer = timer_t.new()
   -- Disable global value for new.
-  disable_globalvalue()
+  --disable_globalvalue()
   return 2
 end
 

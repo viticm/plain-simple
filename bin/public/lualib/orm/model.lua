@@ -47,25 +47,25 @@ DB = {
     password = DB.password or nil
 }
 
-local sql, _connect
+local sql, _connect, err
 
 -- Get database by settings
 if DB.type == SQLITE then
     local luasql = require("luasql.sqlite3")
     sql = luasql.sqlite3()
-    _connect = sql:connect(DB.name)
+    _connect, err = sql:connect(DB.name)
 
 elseif DB.type == MYSQL then
     local luasql = require("luasql.mysql")
     sql = luasql.mysql()
     print(DB.name, DB.username, DB.password, DB.host, DB.port)
-    _connect = sql:connect(DB.name, DB.username, DB.password, DB.host, DB.port)
+    _connect, err = sql:connect(DB.name, DB.username, DB.password, DB.host, DB.port)
 
 elseif DB.type == POSTGRESQL then
     local luasql = require("luasql.postgres")
     sql = luasql.postgres()
     print(DB.name, DB.username, DB.password, DB.host, DB.port)
-    _connect = sql:connect(DB.name, DB.username, DB.password, DB.host, DB.port)
+    _connect, err = sql:connect(DB.name, DB.username, DB.password, DB.host, DB.port)
 
 else
     BACKTRACE(ERROR, "Database type not suported '" .. tostring(DB.type) .. "'")
@@ -73,6 +73,7 @@ end
 
 if not _connect then
     BACKTRACE(ERROR, "Connect problem!")
+    print("orm connect error:", err)
 end
 
 -- if DB.new then
@@ -98,11 +99,12 @@ db = {
     execute = function (self, query)
         BACKTRACE(DEBUG, query)
 
-        local result = self.connect:execute(query)
+        local result, err = self.connect:execute(query)
 
         if result then
             return result
         else
+            print("db:execute error: ", err)
             BACKTRACE(WARNING, "Wrong SQL query")
         end
     end,

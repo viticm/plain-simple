@@ -57,3 +57,50 @@ function test_redis()
 end
 
 test_redis()
+
+DB = {
+  type = "mysql",
+  name = "test",
+  host = "127.0.0.1",
+  port = 3306,
+  username = "root",
+  password = "mysql",
+  new = true,
+}
+
+function test_orm()
+  local Table = require("orm.model")
+  local fields = require("orm.tools.fields")
+  
+  -- Create table.
+  local User = Table({
+    __tablename__ = "user",
+    username = fields.CharField({max_length = 100, unique = true}),
+    password = fields.CharField({max_length = 50, unique = true}),
+    age = fields.IntegerField({max_length = 2, null = true}),
+    job = fields.CharField({max_length = 50, null = true}),
+    time_create = fields.DateTimeField({null = true})
+  })
+  Table:create_table(User)
+  
+  -- New record.
+  local user = User({
+    username = "Bob Smith",
+    password = "SuperSecretPassword",
+    time_create = os.time()
+  })
+  user:save()
+
+  print("User " .. user.username .. " has id " .. user.id)
+
+  user.username = "John Smith"
+  user:save()
+  print("New user name is " .. user.username)
+
+  -- Update.
+  User.get:where({time_create__null = true})
+          :update({time_create = os.time()})
+
+end
+
+test_orm()

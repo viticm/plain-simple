@@ -26,7 +26,7 @@ field.PrimaryField = Field:register({
     __type__ = "integer",
     validator = Type.is.int,
     settings = {
-        null = true,
+        null = false,
         primary_key = true,
         auto_increment = true
     },
