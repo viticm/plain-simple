@@ -81,7 +81,7 @@ function test_orm()
     job = fields.CharField({max_length = 50, null = true}),
     time_create = fields.DateTimeField({null = true})
   })
-  Table:create_table(User)
+  --Table:create_table(User)
   
   -- New record.
   local user = User({
