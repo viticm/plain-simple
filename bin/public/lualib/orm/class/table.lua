@@ -2,6 +2,7 @@
 --                          Required classes                                --
 ------------------------------------------------------------------------------
 
+local Type = require('orm.class.type')
 local Select = require('orm.class.select')
 local Query, QueryList = require('orm.class.query')
 local fields = require('orm.tools.fields')
@@ -11,7 +12,7 @@ local fields = require('orm.tools.fields')
 --                               Table                                      --
 ------------------------------------------------------------------------------
 
-Table = {
+local Table = {
     -- database table name
     __tablename__ = nil,
 
@@ -27,14 +28,16 @@ Table = {
 -- @table_instance.__colnames {table} list of column instances
 -- @table_instance.__foreign_keys {table} list of foreign key
 --                                        column instances
+-- @table_instance.__db__ {table} the database connection instance.
 -------------------------------------------
 function Table:create_table(table_instance)
     -- table information
     local tablename = table_instance.__tablename__
+    local db = table_instance.__db__
     local columns = table_instance.__colnames
     local foreign_keys = table_instance.__foreign_keys
 
-    BACKTRACE(INFO, "Start create table: " .. tablename)
+    ORM_BACKTRACE(ORM_INFO, "Start create table: " .. tablename)
 
     -- other variables
     local create_query = "CREATE TABLE IF NOT EXISTS `" .. tablename .. "` \n("
@@ -77,6 +80,11 @@ function Table.new(self, args)
     self.__tablename__ = args.__tablename__
     args.__tablename__ = nil
 
+    self.__db__ = args.__db__
+    args.__db__ = nil
+
+    assert(self.__db__)
+
     -- Determine the column creation order
     -- This is necessary because tables in lua have no order
     self.__columnCreateOrder__ = { "id" };
@@ -110,6 +118,9 @@ function Table.new(self, args)
 
         -- SQL table name
         __tablename__ = self.__tablename__,
+
+        -- Database connection.
+        __db__ = self.__db__,
 
         -- list of column names
         __colnames = {},
@@ -177,7 +188,7 @@ function Table.new(self, args)
                 end
             end
 
-            BACKTRACE(WARNING, "Can't find column '" .. tostring(colname) ..
+            local _ = ORM_DEBUG_ON and ORM_BACKTRACE(ORM_WARNING, "Can't find column '" .. tostring(colname) ..
                                "' in table '" .. self.__tablename__ .. "'")
         end,
 
@@ -194,13 +205,14 @@ function Table.new(self, args)
                 end
             end
 
-            BACKTRACE(WARNING, "Can't find column '" .. tostring(column) ..
+            local _ = ORM_DEBUG_ON and ORM_BACKTRACE(ORM_WARNING, "Can't find column '" .. tostring(column) ..
                                "' in table '" .. self.__tablename__ .. "'")
         end
     }
 
     -- Add default column 'id'
-    args.id = fields.PrimaryField({auto_increment = true})
+    local dbtype = self.__db__.settings.type
+    args.id = fields.PrimaryField({auto_increment = true, dbtype = dbtype})
 
     -- copy column arguments to new table instance
     for _, colname in ipairs(self.__columnCreateOrder__) do
@@ -221,10 +233,10 @@ function Table.new(self, args)
         __index = Table_instance.__index
     })
 
-    _G.All_Tables[self.__tablename__] = Table_instance
+    _G.ORM_All_Tables[self.__tablename__] = Table_instance
 
     -- Create new table if needed
-    if DB.new then
+    if self.__db__.settings.new then
         self:create_table(Table_instance)
     end
 

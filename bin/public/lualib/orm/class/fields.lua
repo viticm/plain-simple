@@ -1,4 +1,10 @@
 ------------------------------------------------------------------------------
+--                               Require                                    --
+------------------------------------------------------------------------------
+
+local Type = require('orm.class.type')
+
+------------------------------------------------------------------------------
 --                                  Class                                   --
 ------------------------------------------------------------------------------
 
@@ -86,7 +92,8 @@ local Field = {
                             _type = _type .. " PRIMARY KEY"
                         end
 
-                        if this.settings.auto_increment and DB.type ~= SQLITE then
+                        local dbtype = args.dbtype -- If type is sqlite and auto_increment setting then need set the type.
+                        if this.settings.auto_increment and dbtype ~= SQLITE then
                             _type = _type .. " AUTO_INCREMENT"
                         end
 

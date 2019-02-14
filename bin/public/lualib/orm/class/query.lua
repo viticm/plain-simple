@@ -65,7 +65,7 @@ function Query(own_table, data)
                     self._data[colname].old = self._data[colname].new
                     self._data[colname].new = colvalue
                 else
-                    BACKTRACE(WARNING, "Not valid column value for update")
+                    ORM_BACKTRACE(ORM_WARNING, "Not valid column value for update")
                 end
             end
         end,
@@ -82,6 +82,7 @@ function Query(own_table, data)
             local _connect
             local value
             local colname
+            local db = self.own_table.__db__
 
             for _, table_column in pairs(self.own_table.__colnames) do
                 colname = table_column.name
@@ -96,7 +97,7 @@ function Query(own_table, data)
                             value = _G.escapeValue(self.own_table, colname, value)
                             value = table_column.field.as(value)
                         else
-                            BACKTRACE(WARNING, "Wrong type for table '" ..
+                            ORM_BACKTRACE(ORM_WARNING, "Wrong type for table '" ..
                                                 self.own_table.__tablename__ ..
                                                 "' in column '" .. tostring(colname) .. "'")
                             return false
@@ -138,6 +139,7 @@ function Query(own_table, data)
             local update = "UPDATE `" .. self.own_table.__tablename__ .. "` "
             local equation_for_set = {}
             local set, coltype
+            local db = self.own_table.__db__
 
             for colname, colinfo in pairs(self._data) do
                 if colinfo.old ~= colinfo.new and colname ~= ID then
@@ -150,7 +152,7 @@ function Query(own_table, data)
 
                         table.insert(equation_for_set, set)
                     else
-                        BACKTRACE(WARNING, "Can't update value for column `" ..
+                        ORM_BACKTRACE(ORM_WARNING, "Can't update value for column `" ..
                                            Type.to.str(colname) .. "`")
                     end
                 end
@@ -184,6 +186,7 @@ function Query(own_table, data)
             if self.id then
                 delete = "DELETE FROM `" .. self.own_table.__tablename__ .. "` "
                 delete = delete .. "WHERE `" .. ID .. "` = " .. self.id
+                local db = self.own_table.__db__
 
                 db:execute(delete)
             end
@@ -203,8 +206,8 @@ function Query(own_table, data)
                     old = colvalue
                 }
             else
-                if _G.All_Tables[colname] then
-                    current_table = _G.All_Tables[colname]
+                if _G.ORM_All_Tables[colname] then
+                    current_table = _G.ORM_All_Tables[colname]
                     colvalue = Query(current_table, colvalue)
 
                     query._readonly[colname .. "_all"] = QueryList(current_table, {})
@@ -216,7 +219,7 @@ function Query(own_table, data)
             end
         end
     else
-        BACKTRACE(INFO, "Create empty row instance for table '" ..
+        ORM_BACKTRACE(ORM_INFO, "Create empty row instance for table '" ..
                         self.own_table.__tablename__ .. "'")
     end
 

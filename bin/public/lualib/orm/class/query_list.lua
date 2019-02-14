@@ -1,4 +1,10 @@
 ------------------------------------------------------------------------------
+--                               Require                                    --
+------------------------------------------------------------------------------
+
+local Type = require('orm.class.type')
+
+------------------------------------------------------------------------------
 --                          query_list.lua                                  --
 ------------------------------------------------------------------------------
 
@@ -58,7 +64,7 @@ function QueryList(own_table, rows)
                     end
                 end
             else
-                BACKTRACE(WARNING, "ID `" .. id .. "` is not integer value")
+                ORM_BACKTRACE(ORM_WARNING, "ID `" .. id .. "` is not integer value")
             end
         end,
 
@@ -69,7 +75,7 @@ function QueryList(own_table, rows)
 
         -- Get count of values in stack
         count = function (self)
-            return table.getn(self._stack)
+            return #self._stack
         end,
 
         -- Remove from database all elements from stack
@@ -94,7 +100,7 @@ function QueryList(own_table, rows)
                 if Type.is.table(value)
                 and current_query._readonly[key .. "_all"] then
                     current_query._readonly[key .. "_all"]:add(
-                        Query(_G.All_Tables[key], value)
+                        Query(_G.ORM_All_Tables[key], value)
                     )
                 end
             end

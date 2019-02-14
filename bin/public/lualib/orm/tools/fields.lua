@@ -2,10 +2,8 @@
 --                                  Libs                                   --
 ------------------------------------------------------------------------------
 
-Type = require('orm.class.type')
-Field = require('orm.class.fields')
-
-
+local Type = require('orm.class.type')
+local Field = require('orm.class.fields')
 
 ------------------------------------------------------------------------------
 --                                Field Types                               --

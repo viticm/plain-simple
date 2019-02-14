@@ -1,4 +1,10 @@
 ------------------------------------------------------------------------------
+--                               Require                                    --
+------------------------------------------------------------------------------
+
+local Type = require('orm.class.type')
+
+------------------------------------------------------------------------------
 --                                Constants                                 --
 ------------------------------------------------------------------------------
 
@@ -72,13 +78,13 @@ local Select = function(own_table)
                 if value then
                     result = " IS NULL"
                 else
-                    result = " NOT NULL"
+                    result = " IS NOT NULL"
                 end
 
             elseif colname:endswith(IN) or colname:endswith(NOT_IN) then
                 rule = colname:endswith(IN) and IN or NOT_IN
 
-                if type(value) == "table" and table.getn(value) > 0 then
+                if type(value) == "table" and #value > 0 then
                     colname = string.cutend(colname, rule)
                     table_column = self.own_table:get_column(colname)
                     _in = {}
@@ -219,7 +225,7 @@ local Select = function(own_table)
                     join_mode = "FULL OUTER JOIN"
 
                 else
-                    BACKTRACE(WARNING, "Not valid join mode " .. mode)
+                    ORM_BACKTRACE(ORM_WARNING, "Not valid join mode " .. mode)
                 end
 
                 if self:_has_foreign_key_table(right_table, left_table) then
@@ -227,7 +233,7 @@ local Select = function(own_table)
                     tablename = right_table.__tablename__
 
                 elseif not self:_has_foreign_key_table(right_table, left_table) then
-                    BACKTRACE(WARNING, "Not valid tables links")
+                    local _ = ORM_DEBUG_ON and ORM_BACKTRACE(ORM_WARNING, "Not valid tables links")
                 end
 
                 for _, key in pairs(left_table.__foreign_keys) do
@@ -286,12 +292,13 @@ local Select = function(own_table)
             local where
             local rule
             local join
+            local db = self.own_table.__db__
 
             --------------------- Include Columns To Select ------------------
             _select = "SELECT " .. including
 
             -- Add join rules
-            if table.getn(self._rules.columns.join) > 0 then
+            if #self._rules.columns.join > 0 then
                 local unique_tables = { self.own_table }
                 local join_tables = {}
                 local left_table, right_table
@@ -315,7 +322,7 @@ local Select = function(own_table)
             end
 
             -- Check aggregators in select
-            if table.getn(self._rules.columns.include) > 0 then
+            if #self._rules.columns.include > 0 then
                 local aggregators = {}
                 local aggregator, as
 
@@ -341,7 +348,7 @@ local Select = function(own_table)
             end
 
             -- Build GROUP BY
-            if table.getn(self._rules.group) > 0 then
+            if #self._rules.group > 0 then
                 rule = self:_update_col_names(self._rules.group)
                 rule = table.join(rule)
                 _select = _select .. " \nGROUP BY " .. rule
@@ -354,7 +361,7 @@ local Select = function(own_table)
             end
 
             -- Build ORDER BY
-            if table.getn(self._rules.order) > 0 then
+            if #self._rules.order > 0 then
                 rule = self:_update_col_names(self._rules.order)
                 rule = table.join(rule)
                 _select = _select .. " \nORDER BY " .. rule
@@ -369,7 +376,6 @@ local Select = function(own_table)
             if self._rules.offset then
                 _select = _select .. " \nOFFSET " .. self._rules.offset
             end
-
             return db:rows(_select, self.own_table)
         end,
 
@@ -392,7 +398,7 @@ local Select = function(own_table)
                 end
 
             else
-                BACKTRACE(WARNING, "Not a string and not a table (" ..
+                ORM_BACKTRACE(ORM_WARNING, "Not a string and not a table (" ..
                                    tostring(colname) .. ")")
             end
         end,
@@ -409,11 +415,11 @@ local Select = function(own_table)
                     and value[1].__classtype__ == AGGREGATOR then
                         table.insert(self._rules.columns.include, value)
                     else
-                        BACKTRACE(WARNING, "Not valid aggregator syntax")
+                        ORM_BACKTRACE(ORM_WARNING, "Not valid aggregator syntax")
                     end
                 end
             else
-                BACKTRACE(WARNING, "You can include only table type data")
+                ORM_BACKTRACE(ORM_WARNING, "You can include only table type data")
             end
 
             return self
@@ -433,7 +439,7 @@ local Select = function(own_table)
                 table.insert(self._rules.columns.join,
                             {left_table, right_table, MODE})
             else
-                BACKTRACE(WARNING, "Not table in join")
+                ORM_BACKTRACE(ORM_WARNING, "Not table in join")
             end
 
             return self
@@ -480,7 +486,7 @@ local Select = function(own_table)
             if Type.is.int(count) then
                 self._rules.limit = count
             else
-                BACKTRACE(WARNING, "You try set limit to not integer value")
+                ORM_BACKTRACE(ORM_WARNING, "You try set limit to not integer value")
             end
 
             return self
@@ -491,7 +497,7 @@ local Select = function(own_table)
             if Type.is.int(count) then
                 self._rules.offset = count
             else
-                BACKTRACE(WARNING, "You try set offset to not integer value")
+                ORM_BACKTRACE(ORM_WARNING, "You try set offset to not integer value")
             end
 
             return self
@@ -529,6 +535,7 @@ local Select = function(own_table)
                 local coltype
                 local _set_tbl = {}
                 local i=1
+                local db = self.own_table.__db__
 
                 for colname, new_value in pairs(data) do
                     coltype = self.own_table:get_column(colname)
@@ -540,7 +547,7 @@ local Select = function(own_table)
                                 coltype.field.as(new_value)
                         i=i+1
                     else
-                        BACKTRACE(WARNING, "Can't update value for column `" ..
+                        ORM_BACKTRACE(ORM_WARNING, "Can't update value for column `" ..
                                             Type.to.str(colname) .. "`")
                     end
                 end
@@ -549,7 +556,7 @@ local Select = function(own_table)
                 if next(self._rules.where) then
                     _where = self:_condition(self._rules.where, "\nWHERE")
                 else
-                    BACKTRACE(INFO, "No 'where' statement. All data update!")
+                    ORM_BACKTRACE(ORM_INFO, "No 'where' statement. All data update!")
                 end
 
                 if _set ~= "" then
@@ -561,10 +568,10 @@ local Select = function(own_table)
 
                     db:execute(_update)
                 else
-                    BACKTRACE(WARNING, "No table columns for update")
+                    ORM_BACKTRACE(ORM_WARNING, "No table columns for update")
                 end
             else
-                BACKTRACE(WARNING, "No data for global update")
+                ORM_BACKTRACE(ORM_WARNING, "No data for global update")
             end
         end,
 
@@ -574,12 +581,13 @@ local Select = function(own_table)
 
         delete = function (self)
             local _delete = "DELETE FROM `" .. self.own_table.__tablename__ .. "` "
+            local db = self.own_table.__db__
 
             -- Build WHERE
             if next(self._rules.where) then
                 _delete = _delete .. self:_condition(self._rules.where, "\nWHERE")
             else
-                BACKTRACE(WARNING, "Try delete all values")
+                ORM_BACKTRACE(ORM_WARNING, "Try delete all values")
             end
 
             db:execute(_delete)

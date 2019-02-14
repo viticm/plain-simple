@@ -1,15 +1,20 @@
+------------------------------------------------------------------------------
+--                               Require                                    --
+------------------------------------------------------------------------------
+
+local Type = require('orm.class.type')
 
 ------------------------------------------------------------------------------
 --                                Constants                                 --
 ------------------------------------------------------------------------------
 
 -- Backtrace types
-ERROR = 'e'
-WARNING = 'w'
-INFO = 'i'
-DEBUG = 'd'
+ORM_ERROR = 'e'
+ORM_WARNING = 'w'
+ORM_INFO = 'i'
+ORM_DEBUG = 'd'
 
-All_Tables = {}
+ORM_All_Tables = {}
 
 ------------------------------------------------------------------------------
 --                          Helping functions                               --
@@ -25,21 +30,21 @@ function pairs(Table)
     end
 end
 
-function BACKTRACE(tracetype, message)
-    if DB.backtrace then
-        if tracetype == ERROR then
+function ORM_BACKTRACE(tracetype, message)
+    if ORM_BACKTRACE_ON then
+        if tracetype == ORM_ERROR then
             print("[SQL:Error] " .. message)
             os.exit()
 
-        elseif tracetype == WARNING then
+        elseif tracetype == ORM_WARNING then
             print("[SQL:Warning] " .. message)
 
-        elseif tracetype == INFO then
+        elseif tracetype == ORM_INFO then
             print("[SQL:Info] " .. message)
         end
     end
 
-    if DB.DEBUG and tracetype == DEBUG then
+    if ORM_DEBUG_ON and tracetype == ORM_DEBUG then
         print("[SQL:Debug] " .. message)
     end
 end

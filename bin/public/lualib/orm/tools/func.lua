@@ -41,17 +41,18 @@ _G.SUM = Property({
 function _G.escapeValue(own_table, colname, colvalue)
 
   local coltype = own_table:get_column(colname)
+  local setting = own_table.__db__.setting
   if coltype and coltype.settings.escape_value then
 
     local fieldtype = coltype.field.__type__
     if fieldtype:find("text") or fieldtype:find("char") then
 
-      if (DB.type == "sqlite3" or DB.type == "mysql" or DB.type == "postgresql") then
+      if (setting.type == "sqlite3" or setting.type == "mysql" or setting.type == "postgresql") then
 
         -- See https://keplerproject.github.io/luasql/manual.html for a list of
         -- database drivers that support this method
         colvalue = db.connect:escape(colvalue)
-      elseif (DB.type == "oracle") then
+      elseif (setting.type == "oracle") then
         BACKTRACE(WARNING, "Can't autoescape values for oracle databases (Tried to escape field `" .. colname .. "`)");
       end
 
