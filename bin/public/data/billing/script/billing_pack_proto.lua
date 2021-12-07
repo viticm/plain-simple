@@ -11,8 +11,8 @@
 module("billing_pack_proto_t", package.seeall)
 
 local dumptable = require 'dumptable'
-
-local handlers = handlers or {}
+local data = require 'billing_data'
+local handlers = data.handlers
 
 function get_defines()
   local files = {}
@@ -46,32 +46,36 @@ end
 function handler(npack, conn)
   print('billing_pack_proto_t.handler', npack, conn)
   local id = net.read_id(npack)
-  if not handlers[id] then
-    log.fast_warning('billing_pack_proto_t cant found handler from: %d', id)
+  local name = kConfig.billing_pack_defines._id_hash[id]
+  if not handlers[name] then
+    log.fast_warning(
+      'billing_pack_proto_t cant found handler from: (%d|%s)', id, name or '?')
     return
   end
   local pack = billing_pack_t.new({
+    id = id,
     pointer = npack,
   })
   assert(pack.data)
   print('billing_pack_proto_t.handler', util_t.dump(pack.data))
-  local name = kConfig.billing_pack_defines._id_hash[id]
   local proto = kConfig.billing_pack_defines[name]
   local response = proto.response
-  local r = handlers[id](pack.data)
+  local r = handlers[name](pack.data)
   if response then
     r = r or {}
     local rpack = billing_pack_t.new({
       id = id,
+      alloc = true,
       response = true,
       data = r,
-      manager_name = 'billing',
+      manager_name = 'listener',
       name_or_id = conn,
+      listener_name = 'billing',
     })
     rpack:send()
   end
 end
 
-function reg_handler(id, func)
-  handlers[id] = func
+function reg_handler(name, func)
+  handlers[name] = func
 end

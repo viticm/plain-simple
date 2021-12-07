@@ -48,8 +48,9 @@ local def_datas = {
 -- 读取某个类型的数据
 -- @param string origin 协议名
 -- @param string tp 数据类型
+-- @param mixed size 数据长度
 -- @return mixed
-local function read_one(self, origin, tp)
+local function read_one(self, origin, tp, size)
   if not self.pointer or not tp then return end
   local r
   if '*' == string.sub(tp, 1, 1) then
@@ -59,7 +60,10 @@ local function read_one(self, origin, tp)
     for i = 1, count do
       table.insert(r, read_one(self, rtp))
     end
-  elseif kConfig.billing_pack_defines[tp] and origin ~= tp then
+  elseif kConfig.billing_pack_defines[tp] and
+    not kConfig.billing_pack_defines[tp].request then
+    local array = util_t.split(tp)
+    assert(array[#array] == tp)
     r = self:read_proto(self, tp)
   elseif local_ops[tp] then
     r = local_ops[tp](self)
@@ -67,7 +71,7 @@ local function read_one(self, origin, tp)
     local name = 'read_' .. tp
     local func = net[name]
     assert(func)
-    r = func(self.pointer)
+    r = func(self.pointer, size)
   end
   return r
 end
@@ -112,6 +116,7 @@ function new(conf)
     pointer = conf.pointer,
     id = conf.id,
     manager_name = conf.manager_name,
+    listener_name = conf.listener_name,
     name_or_id = conf.name_or_id,
     data = conf.data or {}, -- The packet table data.
     response = conf.response, -- If the response packet.
@@ -146,7 +151,8 @@ end
 function parse(self)
   local pd = kConfig.billing_pack_defines
   local name = self.id and pd._id_hash[self.id]
-  if name then
+  print('parse name=============', name, pd[name], self.id)
+  if not name then
     log.error('billing_pack_t.parse cant parse(%d) not found', self.id or -1)
     return
   end
@@ -162,8 +168,8 @@ end
 function read_proto(self, name, struct)
   local r = {}
   for _, one in ipairs(struct) do
-    local key, tp = table.unpack(one)
-    r[key] = read_one(self, name, tp)
+    local key, tp, size = table.unpack(one)
+    r[key] = read_one(self, name, tp, size)
   end
   return r
 end
@@ -174,6 +180,7 @@ end
 -- @return mixed
 function write_proto(self, name, parent)
   local struct = kConfig.billing_pack_defines[name]
+  -- print('struct:', name, util_t.dump(struct))
   if not parent then
     struct = self.response and struct.response or struct.request
   end
@@ -189,7 +196,10 @@ end
 -- 发送数据
 function send(self)
   local name = kConfig.billing_pack_defines._id_hash[self.id]
+  print('send==========', name, util_t.dump(self.data))
   assert(name)
-  self:write_proto(self, name)
-  return net.send(self.manager_name, self.name_or_id, self.pointer)
+  net.packet_reset(self.pointer)
+  self:write_proto(name)
+  return net.send(
+    self.manager_name, self.name_or_id, self.pointer, self.listener_name)
 end

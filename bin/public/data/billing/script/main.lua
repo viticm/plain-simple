@@ -10,6 +10,7 @@
  -       之后不能再创建新的全局变量
 --]]
 
+require("handlers/all")
 
 -- 入口方法，服务器启动完成时执行一次
 function main()

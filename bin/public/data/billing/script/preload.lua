@@ -56,9 +56,10 @@ for _, line in pairs(scriptvalue_table) do
 end
 
 -- 模块加载
+require_ex('util')
 require_ex("config")
 require_ex("timer")
-require_ex("main")
-require_ex("test")
 require_ex('billing_pack')
 require_ex('billing_pack_proto')
+require_ex("main")
+require_ex("test")
