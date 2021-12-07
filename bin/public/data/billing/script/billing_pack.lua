@@ -133,11 +133,11 @@ function new(conf)
   return obj
 end
 
-function read(self, tp)
+function read(self, tp, size)
   local name = 'read_' .. tp
   local func = net[name]
   assert(func)
-  return func(self.pointer)
+  return func(self.pointer, size)
 end
 
 function write(self, tp, value)
