@@ -11,11 +11,13 @@
 
 -- 配置文件加载方法
 function loadconfig()
- 
+
   -- Load protobuf files.
   net.pb_define_load("pb_define")
   net.pb_load(PUBLIC_PATH.."/pbfiles")
 
   kConfig = {}
+
+  kConfig.billing_pack_defines = billing_pack_proto_t.get_defines()
 
 end

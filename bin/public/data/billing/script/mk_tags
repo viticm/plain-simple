@@ -4,6 +4,7 @@
 #@author viticm<viticm@126.com>
 paths="
 ./
+../../../lualib
 "
 types="php lua h tpp cpp c cc hpp erl hrl inl"
 n=0

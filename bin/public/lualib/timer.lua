@@ -1,13 +1,12 @@
 --[[
- - PAP Engine ( https://github.com/viticm/plainframework1 )
+ - PLAIN FREAMEWORK ( https://github.com/viticm/plain-simple )
  - $Id timer.lua
- - @link https://github.com/viticm/plainframework1 for the canonical source repository
- - @copyright Copyright (c) 2014- viticm( viticm@126.com/viticm.ti@gmail.com )
+ - @link https://github.com/viticm/plain-simple for the canonical source repository
+ - @copyright Copyright (c) 2021 viticm( viticm.ti@gmail.com )
  - @license
- - @user viticm<viticm@126.com/viticm.ti@gmail.com>
- - @date 2015/04/28 14:23
- - @uses timer table
- -       cn: 需要自己的监听方法来调用定时方法
+ - @user viticm( viticm.ti@gmail.com )
+ - @date 2021/12/06 15:20
+ - @uses The timer class.
 --]]
 module("timer_t", package.seeall)
 

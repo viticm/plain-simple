@@ -20,9 +20,11 @@ end
 
 -- Scripts.
 if g_debug then
-  package.path = "./?.lua;" .. ROOTPATH .. "/?.lua;".. BASEPATH .."/public/lualib/?.lua;".. BASEPATH .."/public/luaconf/?.lua"
+  package.path = "./?.lua;" .. ROOTPATH .. "/?.lua;"..
+    BASEPATH .."/public/lualib/?.lua;".. BASEPATH .."/public/luaconf/?.lua"
 else
-  package.path = "./?.lc;" .. ROOTPATH .. "?.lc;".. BASEPATH .."/public/lualib/?.lc" .. BASEPATH .."/public/luaconf/?.lc"
+  package.path = "./?.lc;" .. ROOTPATH .. "?.lc;"..
+    BASEPATH .."/public/lualib/?.lc" .. BASEPATH .."/public/luaconf/?.lc"
 end
 
 require("preload")
