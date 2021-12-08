@@ -1,0 +1,56 @@
+-- 连接
+billing_pack_proto_t.reg_handler('connect', function(pack)
+
+end)
+
+-- 定时检测
+billing_pack_proto_t.reg_handler('ping', function(pack)
+  return {
+    result = 1
+  }
+end)
+
+-- 注册
+billing_pack_proto_t.reg_handler('register', function(pack)
+
+end)
+
+-- 进入游戏
+billing_pack_proto_t.reg_handler('enter_game', function(pack)
+
+end)
+
+-- 兑换点数
+billing_pack_proto_t.reg_handler('convert_point', function(pack)
+
+end)
+
+-- 元宝消耗记录
+billing_pack_proto_t.reg_handler('cost_log', function(pack)
+
+end)
+
+-- 保持在线
+billing_pack_proto_t.reg_handler('keep', function(pack)
+
+end)
+
+-- 踢下线
+billing_pack_proto_t.reg_handler('kick', function(pack)
+
+end)
+
+-- 登陆
+billing_pack_proto_t.reg_handler('login', function(pack)
+
+end)
+
+-- 登出
+billing_pack_proto_t.reg_handler('logout', function(pack)
+
+end)
+
+-- 查询点数
+billing_pack_proto_t.reg_handler('query_point', function(pack)
+
+end)

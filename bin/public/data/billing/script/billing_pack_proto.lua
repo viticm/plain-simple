@@ -79,3 +79,18 @@ end
 function reg_handler(name, func)
   handlers[name] = func
 end
+
+function load_handlers()
+  local files = {}
+  file.find_path(ROOTPATH .. '/handlers/', '%.lua', files, true)
+  print('files================', dumptable(files))
+  for _, filename in ipairs(files) do
+    local func = loadfile(filename)
+    if func then
+      local name = file.strip_extension(file.strip_path(filename))
+      local f = func()
+      assert(f)
+      handlers[name] = f
+    end
+  end
+end

@@ -10,13 +10,12 @@
  -       之后不能再创建新的全局变量
 --]]
 
-require("handlers/all")
-
 -- 入口方法，服务器启动完成时执行一次
 function main()
   loadconfig()
   g_system_timer = timer_t.new()
   db_t.init()
+  billing_pack_proto_t.load_handlers()
   print('tool.md5()', tool.split2table('xxxxxxxx'))
   -- Disable global value for new.
   disable_globalvalue()
