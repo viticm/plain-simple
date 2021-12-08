@@ -8,6 +8,8 @@
  - @date 2015/04/24 13:14
  - @uses 工具模块
 --]]
+local gbk = require 'gbk'
+
 module("util_t", package.seeall)
 
 -- Function to convert a table to a string
@@ -805,4 +807,14 @@ end
 -- Split string.
 function split(str, seq)
   return tool.split2table(str, seq)
+end
+
+-- GBK string to UTF8
+function gbk_toutf8(str)
+  return gbk.toutf8(str)
+end
+
+-- UTF8 string to GBK.
+function utf8_togbk(str)
+  return gbk.fromutf8(str)
 end
