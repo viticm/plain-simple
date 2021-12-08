@@ -16,6 +16,8 @@ require("handlers/all")
 function main()
   loadconfig()
   g_system_timer = timer_t.new()
+  db_t.init()
+  print('tool.md5()', tool.split2table('xxxxxxxx'))
   -- Disable global value for new.
   disable_globalvalue()
   return 2

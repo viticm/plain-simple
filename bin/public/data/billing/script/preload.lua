@@ -57,6 +57,7 @@ end
 
 -- 模块加载
 require_ex('util')
+require_ex('db')
 require_ex("config")
 require_ex("timer")
 require_ex('billing_pack')

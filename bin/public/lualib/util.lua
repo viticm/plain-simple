@@ -8,8 +8,6 @@
  - @date 2015/04/24 13:14
  - @uses 工具模块
 --]]
-local split_core = require 'split.c'
-
 module("util_t", package.seeall)
 
 -- Function to convert a table to a string
@@ -801,10 +799,10 @@ end
 
 -- Split string.
 function split_row(str, seq)
-  return split_core.splitrow(str, seq)
+  return tool.split2stack(str, seq)
 end
 
 -- Split string.
 function split(str, seq)
-  return split_core.split(str, seq)
+  return tool.split2table(str, seq)
 end
