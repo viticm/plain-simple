@@ -1,0 +1,1 @@
+gcc -fPIC --shared -std=c11 -g -O2 -Wall lgbk.c -o gbk.so
