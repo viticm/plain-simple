@@ -132,6 +132,7 @@ function Query(own_table, data)
             _connect = db:insert(insert)
 
             self._data.id = {new = _connect}
+            return _connect
         end,
 
         -- Update data in database
@@ -140,6 +141,7 @@ function Query(own_table, data)
             local equation_for_set = {}
             local set, coltype
             local db = self.own_table.__db__
+            local result
 
             for colname, colinfo in pairs(self._data) do
                 if colinfo.old ~= colinfo.new and colname ~= ID then
@@ -162,8 +164,9 @@ function Query(own_table, data)
 
             if set ~= "" then
                 update = update .. " SET " .. set .. "\n\t    WHERE `" .. ID .. "` = " .. self.id
-                db:execute(update)
+                result = db:execute(update)
             end
+            return result
         end,
 
         ------------------------------------------------
@@ -173,9 +176,9 @@ function Query(own_table, data)
         -- save row
         save = function (self)
             if self.id then
-                self:_update()
+                return self:_update()
             else
-                self:_add()
+                return self:_add()
             end
         end,
 
@@ -188,9 +191,10 @@ function Query(own_table, data)
                 delete = delete .. "WHERE `" .. ID .. "` = " .. self.id
                 local db = self.own_table.__db__
 
-                db:execute(delete)
+                result = db:execute(delete)
             end
             self._data = {}
+            return result
         end
     }
 

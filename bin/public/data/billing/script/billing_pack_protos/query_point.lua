@@ -7,7 +7,6 @@ return {
     response = {
       {'username', 'string'},
       {'point', 'uint32'},
-      {'result', 'uint8'}
     },
     id = 0xe2,
 }

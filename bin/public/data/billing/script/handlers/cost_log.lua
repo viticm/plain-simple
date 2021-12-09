@@ -9,5 +9,12 @@
  - @uses 元宝消耗记录
 --]]
 return function(pack)
-
+  billing_tool_t.check_online(pack.username, {ip = pack.ip})
+  local rolename = util_t.gbk_toutf8(pack.rolename)
+  log.fast_debug('user(%s|%s|%d) cost yuanbao(%d) at: %s',
+    pack.username, rolename, pack.rolelevel, pack.yuanbao, pack.ip)
+  return {
+    key = pack.key,
+    result = 1,
+  }
 end

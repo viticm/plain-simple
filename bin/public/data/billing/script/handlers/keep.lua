@@ -9,5 +9,10 @@
  - @uses 保持连接
 --]]
 return function(pack)
-
+  log.fast_debug('keep user(%s) level(%d)', pack.username, pack.level)
+  billing_tool_t.check_online(pack.username)
+  return {
+    username = pack.username,
+    result = 1,
+  }
 end

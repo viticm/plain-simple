@@ -529,6 +529,7 @@ local Select = function(own_table)
         --------------------------------------------------------
 
         update = function (self, data)
+            local result
             if Type.is.table(data) then
                 local _update = "UPDATE `" .. self.own_table.__tablename__ .. "`"
                 local _set = ""
@@ -553,6 +554,7 @@ local Select = function(own_table)
                 end
 
                 -- Build WHERE
+                local _where = ''
                 if next(self._rules.where) then
                     _where = self:_condition(self._rules.where, "\nWHERE")
                 else
@@ -566,13 +568,14 @@ local Select = function(own_table)
                         _update = _update .. " SET " .. table.concat(_set_tbl,",") .. " " .. _where
                     end
 
-                    db:execute(_update)
+                    result = db:execute(_update)
                 else
                     ORM_BACKTRACE(ORM_WARNING, "No table columns for update")
                 end
             else
                 ORM_BACKTRACE(ORM_WARNING, "No data for global update")
             end
+            return result
         end,
 
         --------------------------------------------------------
@@ -590,7 +593,7 @@ local Select = function(own_table)
                 ORM_BACKTRACE(ORM_WARNING, "Try delete all values")
             end
 
-            db:execute(_delete)
+            return db:execute(_delete)
         end,
 
         --------------------------------------------------------

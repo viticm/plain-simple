@@ -46,6 +46,8 @@ end
 function handler(npack, conn)
   print('billing_pack_proto_t.handler', npack, conn)
   local id = net.read_id(npack)
+  local index = net.get_exstr(npack)
+  print('index ============', index)
   local name = kConfig.billing_pack_defines._id_hash[id]
   if not handlers[name] then
     log.fast_warning(
@@ -55,6 +57,7 @@ function handler(npack, conn)
   local pack = billing_pack_t.new({
     id = id,
     pointer = npack,
+    index = index,
   })
   assert(pack.data)
   print('billing_pack_proto_t.handler', util_t.dump(pack.data))
@@ -71,6 +74,7 @@ function handler(npack, conn)
       manager_name = 'listener',
       name_or_id = conn,
       listener_name = 'billing',
+      index = index,
     })
     rpack:send()
   end
@@ -89,7 +93,7 @@ function load_handlers()
     if func then
       local name = file.strip_extension(file.strip_path(filename))
       local f = func()
-      assert(f)
+      assert(f, string.format('%s is nil handler', name))
       handlers[name] = f
     end
   end

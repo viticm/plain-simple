@@ -6,7 +6,7 @@
  - @license
  - @user viticm( viticm.ti@gmail.com )
  - @date 2021/12/08 20:20
- - @uses 连接处理
+ - @uses 连接
 --]]
 return function(pack)
   return {result = 1}

@@ -12,7 +12,7 @@ local Type = {
     is = {
         int = function (value)
             if type(value) == "number" then
-                integer, fractional = math.modf(value)
+                local _, fractional = math.modf(value)
                 return fractional == 0
             end
         end,

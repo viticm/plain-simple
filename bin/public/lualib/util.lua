@@ -818,3 +818,94 @@ end
 function utf8_togbk(str)
   return gbk.fromutf8(str)
 end
+
+-- 判断字符串是否为整数
+function is_integer(str)
+    if str == "" or not str then
+       return false
+    end
+    local strTemp = string.match(str, "%d+");
+    if strTemp == nil then
+        return false
+    end
+    return strTemp == str
+end
+
+-- 判断字符串邮箱
+function is_email(str)
+  if str == "" or not str then
+     return false
+  end
+  local str_tmp = string.match(str, "[%d%a]+@%a+.%a+")
+  if str_tmp == nil then
+    return false
+  end
+  return str_tmp == str
+end
+
+-- 判断字符串 日期
+function is_date(str)
+  if str == "" or not str then
+     return false
+  end
+  local str_tmp = string.match(str, "%d+/%d+/%d+")
+  if str_tmp == nil then
+    return false
+  end
+  return str_tmp == str
+end
+
+-- 判断字符串 日期平且判断位数02/12/2020
+function is_right_date(str)
+  if str == "" or not str then
+     return false
+  end
+  local str_tmp = split2table(str, "/")
+  if #str_tmp < 3 then
+    return false
+  end
+  if #str_tmp[1] ~= 2 then
+    return false
+  end
+  if #str_tmp[2] ~= 2 then
+    return false
+  end
+  if #str_tmp[3] ~= 4 then
+    return false
+  end
+  return true
+end
+
+-- 判断字符串 为字母和空格组成
+function is_right_str_with_space(str)
+  if str == "" or not str then
+     return false
+  end
+  local str_tmp = string.match(str, "^[A-Za-z ]+$")
+  if str_tmp == nil then
+    return false
+  end
+  return str_tmp == str
+end
+
+-- 判断字符串 为字母和数字组成
+function is_right_str_with_letter_and_num(str)
+  if str == "" or not str then
+     return false
+  end
+  local str_tmp = string.match(str, "^[A-Za-z0-9]+$")
+  if str_tmp == nil then
+    return false
+  end
+  return str_tmp == str
+end
+
+function count(t)
+  if not t then return 0 end
+  if type(t) ~= 'table' then return 1 end
+  local r = 0
+  for k in pairs(t) do
+    r = r + 1
+  end
+  return r
+end

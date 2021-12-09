@@ -8,7 +8,7 @@ return {
     },
     response = {
       {'username', 'string'},
-      {'request', 'uint8'},
+      {'result', 'uint8'},
     },
     id = 0xf1,
 }

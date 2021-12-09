@@ -9,5 +9,7 @@
  - @uses 心跳包
 --]]
 return function(pack)
-
+  return {
+    result = 1,
+  }
 end

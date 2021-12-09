@@ -71,7 +71,11 @@ local function read_one(self, origin, tp, size)
     local name = 'read_' .. tp
     local func = net[name]
     assert(func)
-    r = func(self.pointer, size)
+    if 'raw' == tp then
+      r = func(self.pointer, size)
+    else
+      r = func(self.pointer)
+    end
   end
   return r
 end
@@ -97,12 +101,16 @@ local function write_one(self, origin, tp, data)
     self:write_proto(self, tp, origin)
   elseif local_ops[tp] then
     data = data or def_datas[tp]
+    print('write===============', tp, data)
     local_ops[tp](self, data)
   else
     data = data or def_datas[tp]
     local name = 'write_' .. tp
     local func = net[name]
     assert(func)
+    if 'raw' == tp then
+      print('data=================', data, string.len(data))
+    end
     func(self.pointer, data)
   end
   return r
@@ -126,6 +134,8 @@ function new(conf)
     if conf.alloc then
       obj.pointer = net.packet_alloc(conf.id)
       assert(obj.pointer)
+      net.set_exstr(obj.pointer, conf.index)
+      print('conf.index================', conf.index)
     end
   else
     obj:parse()
