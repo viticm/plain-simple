@@ -24,7 +24,7 @@ end
 
 -- 脚本心跳
 function heartbeat()
-  testall()
+  g_system_timer:run()
   return 1
 end
 

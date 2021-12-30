@@ -81,15 +81,15 @@ function run(self)
   local now = os.time()
   local check_t = self.check_t
   if now - check_t.sec >= 1 then
-    self:on_onesecond_timer()
     check_t.sec = now
+    self:on_onesecond_timer()
   end
   if now - check_t.minute >= 60 then
-    self:on_oneminute_timer()
     check_t.minute = now
+    self:on_oneminute_timer()
   end
   if now - check_t.fiveminute >= 300 then
-    self:on_oneminute_timer()
     check_t.fiveminute = now
+    self:on_fiveminute_timer()
   end
 end

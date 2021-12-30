@@ -33,19 +33,23 @@ end
 function ORM_BACKTRACE(tracetype, message)
     if ORM_BACKTRACE_ON then
         if tracetype == ORM_ERROR then
-            print("[SQL:Error] " .. message)
+            -- print("[SQL:Error] " .. message)
+            log.slow_error("[SQL:Error] " .. message)
             os.exit()
 
         elseif tracetype == ORM_WARNING then
-            print("[SQL:Warning] " .. message)
+            -- print("[SQL:Warning] " .. message)
+            log.slow_warning("[SQL:Warning] " .. message)
 
         elseif tracetype == ORM_INFO then
-            print("[SQL:Info] " .. message)
+            -- print("[SQL:Info] " .. message)
+            log.slow("[SQL:Info] " .. message)
         end
     end
 
     if ORM_DEBUG_ON and tracetype == ORM_DEBUG then
-        print("[SQL:Debug] " .. message)
+        -- print("[SQL:Debug] " .. message)
+        log.slow_debug("[SQL:Debug] " .. message)
     end
 end
 

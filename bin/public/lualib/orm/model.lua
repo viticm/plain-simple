@@ -172,26 +172,7 @@ db = {
 --                               Function                                   --
 ------------------------------------------------------------------------------
 
--- Create a connection to db.
-function orm_connect(settings)
-  settings = settings or {}
-  settings = {
-      -- ORM settings
-      new = (settings.new == true),
-      DEBUG = (settings.DEBUG == true),
-      backtrace = (settings.backtrace == true),
-      -- database settings
-      type = settings.type or "sqlite3",
-      -- if you use sqlite set database path value
-      -- if not set a database name
-      name = settings.name or "database.db",
-      -- not sqlite db settings
-      host = settings.host or nil,
-      port = settings.port or nil,
-      username = settings.username or nil,
-      password = settings.password or nil
-  }
-
+local function connect(settings)
   local sql, _connect, err
 
   -- Get database by settings
@@ -222,12 +203,41 @@ function orm_connect(settings)
       return
   end
 
+  return _connect
+end
+
+-- Create a connection to db.
+function orm_connect(settings)
+  settings = settings or {}
+  settings = {
+      -- ORM settings
+      new = (settings.new == true),
+      DEBUG = (settings.DEBUG == true),
+      backtrace = (settings.backtrace == true),
+      -- database settings
+      type = settings.type or "sqlite3",
+      -- if you use sqlite set database path value
+      -- if not set a database name
+      name = settings.name or "database.db",
+      -- not sqlite db settings
+      host = settings.host or nil,
+      port = settings.port or nil,
+      username = settings.username or nil,
+      password = settings.password or nil
+  }
+
+  local _connect = connect(settings)
   local db = {
       -- Database connect instance
       connect = _connect,
 
       -- Database settings.
       settings = settings,
+
+      reconnect = function(self)
+          self.connect = connect(self.settings)
+          return self.connect
+      end,
 
       -- Execute SQL query
       execute = function (self, query)
