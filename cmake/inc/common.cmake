@@ -36,3 +36,23 @@ function(plainframework_enable_warnings target)
       -Wno-long-long -Wno-variadic-macros)
   endif()
 endfunction()
+
+# Safe add_subdirectory.
+function(add_subdir target target_build)
+  set(old_root_dir ${root_dir} CACHE INTERNAL "root dir cache")
+  add_subdirectory(${target} ${target_build})
+  set(root_dir ${old_root_dir} CACHE INTERNAL "root dir recover")
+endfunction(add_subdir)
+
+# Sets and caches `var` to the first path in 'paths' that exists.
+# If none of the paths are found, sets `var` to an error value of
+# "path_not_found".
+function(set_to_first_path_that_exists var paths description)
+  foreach(path ${paths})
+    if(EXISTS "${path}")
+      set(${var} "${path}" CACHE PATH description)
+      return()
+    endif()
+  endforeach(path)
+  set(${var} "path_not_found_to_${var}" CACHE PATH description)
+endfunction(set_to_first_path_that_exists)

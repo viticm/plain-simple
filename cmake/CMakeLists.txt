@@ -16,7 +16,6 @@ project(PlainFrameworkSimple)
 # Call fplutil to get locations of dependencies and set common build settings.
 include("inc/internal_utils.cmake")
 include("inc/common.cmake")
-#set_common_build_variables()
 
 # Options that control the build configuration.
 # To configure PlainFramework flags per build target, see the
@@ -73,7 +72,5 @@ macro(plainframework_set_ios_attributes project)
 endmacro(plainframework_set_ios_attributes)
 
 if(plainframework_build_tests)
-  add_subdirectory(${root_dir}/app/cmake
-                   ${root_dir}/app/cmake/build)
-
+  add_subdir(${root_dir}/app/cmake app)
 endif()
