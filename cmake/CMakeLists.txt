@@ -39,6 +39,18 @@ function(plainframework_configure_flags target)
   endif()
 endfunction()
 
+if (not has_output_path)
+
+  # This is the directory into which the executables are built.
+  set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${root_dir}/bin)
+
+  # This is the directory into which the librarys are built.
+  set(LIBRARY_OUTPUT_PATH ${root_dir}/bin)
+
+  set(has_output_path 1)
+
+endif()
+
 # Modify CMAKE_C_FLAGS and CMAKE_CXX_FLAGS to enable a maximum reasonable
 # warning level.
 function(plainframework_enable_warnings target)

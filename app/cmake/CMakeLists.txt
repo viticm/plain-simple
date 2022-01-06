@@ -62,6 +62,6 @@ function(test_executables test_name source)
   MESSAGE(${source})
 endfunction()
 
-file(GLOB_RECURSE CORE_TEST_SOURCES "../src/*.cc")
+file(GLOB_RECURSE APP_SOURCES "../src/*.cc")
 
-test_executables(../../bin/app "${CORE_TEST_SOURCES}")
+test_executables(app "${APP_SOURCES}")
