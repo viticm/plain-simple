@@ -211,7 +211,7 @@ static int Ldbcs_byte(lua_State *L) {
     int i, n;
     if (posi < 1) posi = 1;
     if (pose > (int)len) pose = len;
-    if (pose > pose) return 0;
+    if (posi > pose) return 0;
     n = (int)(pose - posi + 1);
     if (posi + n <= pose) /* (size_t -> int) overflow? */
         return luaL_error(L, "string slice too long");

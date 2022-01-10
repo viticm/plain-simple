@@ -82,6 +82,9 @@ macro(config_compiler_and_linker)
       # http://stackoverflow.com/questions/3232669 explains the issue.
       set(cxx_base_flags "${cxx_base_flags} -wd4702")
     endif()
+    
+    #For utf8 no boom.
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4819")
 
     set(cxx_base_flags "${cxx_base_flags} -D_UNICODE -DUNICODE -DWIN32 -D_WIN32")
     set(cxx_base_flags "${cxx_base_flags} -DSTRICT -DWIN32_LEAN_AND_MEAN")
@@ -129,12 +132,11 @@ macro(config_compiler_and_linker)
   endif()
   
   # Plain Framework core flags.
-  set(cxx_base_flags "${cxx_base_flags} -DPF_CORE -DLUA_COMPAT_MODULE")
+  set(cxx_base_flags "${cxx_base_flags} -DLUA_COMPAT_MODULE")
 
   if(CMAKE_SYSTEM MATCHES Linux)
     set(cxx_base_flags "${cxx_base_flags} -DLUA_USE_LINUX -DPF_OPEN_EPOLL")
   endif(CMAKE_SYSTEM MATCHES Linux)
-
   
   set(cxx_base_flags "${cxx_base_flags} ${PF_HAS_PTHREAD_MACRO}")
 

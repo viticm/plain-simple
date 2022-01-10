@@ -13,6 +13,9 @@ cmake_minimum_required(VERSION 2.8.12)
 #set_compiler_flags_for_external_libraries()
 #restore_compiler_flags()
 
+option(pf_use_shared "Use plain framework with share library." ON)
+option(pf_build_misc "Build all misc library for app" ON)
+
 # Include helper functions and macros used by Google Test.
 config_compiler_and_linker()
 string(REPLACE "-W4" "-W3" cxx_default "${cxx_default}")
@@ -20,7 +23,7 @@ string(REPLACE "-Wshadow" "" cxx_default "${cxx_default}")
 string(REPLACE "-Wextra" "" cxx_default "${cxx_default}")
 
 # This is the directory into which the executables are built.
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
+# set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})
 
 include_directories(${gtest_incdir}
                     ${gtest_hack_incdir}
@@ -33,16 +36,15 @@ if(NOT MSVC)
 endif()
 set(COMMON_LIBS "pf_core;${CMAKE_THREAD_LIBS_INIT}")
 
- # Plain Framework core flags.
-set(cxx_base_flags "${cxx_base_flags} -DPF_CORE -DPF_OPEN_EPOLL")
+if (MSVC AND pf_use_shared)
+  set(cxx_base_flags "${cxx_base_flags} -DPF_BUILD_AS_DLL")
+endif()
+
+# Plain Framework core flags.
+set(cxx_base_flags "${cxx_base_flags} -DPF_OPEN_EPOLL")
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
-endif()
-
-#For utf8 no boom.
-if (MSVC)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -wd4819")
 endif()
 
 # Generate a rule to build a unit test executable ${test_name} with
@@ -61,6 +63,72 @@ function(test_executables test_name source)
   test_executable(${test_name} "${source}")
   MESSAGE(${source})
 endfunction()
+
+# Build lua and other libraries.
+if (pf_build_misc)
+
+  set(lua_misc_dir "../misc/lualib-src/")
+  if (MSVC)
+    set(lua_libs "pf_core;pf_plugin_lua")
+  endif()
+
+  cxx_shared_library(gbk "${cxx_base_flags} ${cxx_default}" "${lua_libs}" "${lua_misc_dir}/lua-gbk/lgbk.c")
+  cxx_shared_library(pb "${cxx_base_flags} ${cxx_default}" "${lua_libs}" "${lua_misc_dir}/lua-protobuf/pb.c")
+  cxx_shared_library(lfs "${cxx_base_flags} ${cxx_default}" "${lua_libs}" "${lua_misc_dir}/luafilesystem/lfs.c")
+  if (MSVC)
+    set(lua_socket_flags "-DLUASOCKET_API=__declspec(dllexport)")
+    set(lua_socket_flags "${lua_socket_flags} -DMIME_API=__declspec(dllexport)")
+  else()
+    set(lua_socket_flags "-DLUASOCKET_API=__attribute__((visibility(\"default\")))")
+    set(lua_socket_flags "${lua_socket_flags} -DUNIX_API=__attribute__((visibility(\"default\")))")
+    set(lua_socket_flags "${lua_socket_flags} -DMIME_API=__attribute__((visibility(\"default\")))")
+  endif()
+	set(lua_socket_core_sources
+		${lua_misc_dir}/luasocket/src/luasocket.c
+		${lua_misc_dir}/luasocket/src/timeout.c
+		${lua_misc_dir}/luasocket/src/buffer.c
+		${lua_misc_dir}/luasocket/src/io.c
+		${lua_misc_dir}/luasocket/src/auxiliar.c
+		${lua_misc_dir}/luasocket/src/options.c
+		${lua_misc_dir}/luasocket/src/inet.c
+		${lua_misc_dir}/luasocket/src/except.c
+		${lua_misc_dir}/luasocket/src/select.c
+		${lua_misc_dir}/luasocket/src/tcp.c
+		${lua_misc_dir}/luasocket/src/udp.c
+		${lua_misc_dir}/luasocket/src/compat.c
+  )
+  if (MSVC)
+    set(lua_socket_core_sources "${lua_socket_core_sources} ${lua_misc_dir}/luasocket/src/wsock.c")
+  else()
+    set(lua_socket_core_sources "${lua_socket_core_sources} ${lua_misc_dir}/luasocket/src/usock.c")
+  endif()
+  set(lua_socket_serial_sources
+		${lua_misc_dir}/luasocket/src/buffer.c
+		${lua_misc_dir}/luasocket/src/auxiliar.c
+		${lua_misc_dir}/luasocket/src/options.c
+		${lua_misc_dir}/luasocket/src/timeout.c
+		${lua_misc_dir}/luasocket/src/io.c
+		${lua_misc_dir}/luasocket/src/usocket.c
+		${lua_misc_dir}/luasocket/src/serial.c
+  )
+  set(lua_socket_mime_sources
+    ${lua_misc_dir}/luasocket/src/mime.c
+    ${lua_misc_dir}/luasocket/src/compat.c
+  )
+  if (NOT MSVC)
+    set(lua_socket_unix_sources
+			${lua_misc_dir}/luasocket/src/buffer.c
+			${lua_misc_dir}/luasocket/src/auxiliar.c
+			${lua_misc_dir}/luasocket/src/options.c
+			${lua_misc_dir}/luasocket/src/timeout.c
+			${lua_misc_dir}/luasocket/src/io.c
+			${lua_misc_dir}/luasocket/src/usocket.c
+			${lua_misc_dir}/luasocket/src/unix.c
+    )
+  endif()
+
+
+endif()
 
 file(GLOB_RECURSE APP_SOURCES "../src/*.cc")
 
