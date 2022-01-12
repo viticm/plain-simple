@@ -77,6 +77,10 @@ endfunction()
 # Build lua and other libraries.
 if (pf_build_misc)
 
+  if (MSVC)
+    set(lua_flags "${lua_flags} -wd4996")
+  endif()
+
   if (NOT lua_dir)
     message(WARNING "can't found the lua directory(use system include)")
   else()
