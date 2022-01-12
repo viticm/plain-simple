@@ -15,6 +15,7 @@ cmake_minimum_required(VERSION 2.8.12)
 
 option(pf_use_shared "Use plain framework with share library." ON)
 option(pf_build_misc "Build all misc library for app" ON)
+option(pf_build_luasql_mysql "Build luasql for mysql library(need installed mysql client library) " OFF)
 
 # Include helper functions and macros used by Google Test.
 config_compiler_and_linker()
@@ -64,27 +65,51 @@ function(test_executables test_name source)
   MESSAGE(${source})
 endfunction()
 
+# Add lua library.
+function (cxx_lua_library name flags libs)
+  cxx_shared_library(${name} "${cxx_base_flags} ${cxx_default} ${flags}" "${lua_libs};${libs}" ${ARGN})
+  set_target_properties(${name} PROPERTIES PREFIX "")
+  set_target_properties(${name}
+    PROPERTIES
+    LIBRARY_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}")
+endfunction()
+
 # Build lua and other libraries.
 if (pf_build_misc)
 
-  set(lua_misc_dir "../misc/lualib-src/")
+  if (NOT lua_dir)
+    message(WARNING "can't found the lua directory(use system include)")
+  else()
+    include_directories(${lua_dir})
+  endif()
+
+  # Lua libraries output directory.
+  if (NOT lua_output_path)
+    if (plain_simple_only)
+      set(lua_output_path "public/luaclib/")
+    else()
+      set(lua_output_path "luaclib/")
+    endif()
+  endif()
+
+  set(lua_misc_dir "${root_dir}/app/misc/lualib-src/")
   if (MSVC)
     set(lua_libs "pf_core;pf_plugin_lua")
   endif()
 
-  cxx_shared_library(gbk "${cxx_base_flags} ${cxx_default}" "${lua_libs}" "${lua_misc_dir}/lua-gbk/lgbk.c")
-  cxx_shared_library(pb "${cxx_base_flags} ${cxx_default}" "${lua_libs}" "${lua_misc_dir}/lua-protobuf/pb.c")
-  cxx_shared_library(lfs "${cxx_base_flags} ${cxx_default}" "${lua_libs}" "${lua_misc_dir}/luafilesystem/lfs.c")
+  cxx_lua_library(gbk "" "" ${lua_misc_dir}/lua-gbk/lgbk.c)
+  cxx_lua_library(pb "" "" ${lua_misc_dir}/lua-protobuf/pb.c)
+  cxx_lua_library(lfs "" "" ${lua_misc_dir}/luafilesystem/src/lfs.c)
   if (MSVC)
-    set(lua_socket_flags "-DLUASOCKET_API=__declspec(dllexport)")
-    set(lua_socket_flags "${lua_socket_flags} -DMIME_API=__declspec(dllexport)")
+    set(lua_socket_flags "-D'LUASOCKET_API=__declspec(dllexport)'")
+    set(lua_socket_flags "${lua_socket_flags} -D'MIME_API=__declspec(dllexport)'")
   else()
-    set(lua_socket_flags "-DLUASOCKET_API=__attribute__((visibility(\"default\")))")
-    set(lua_socket_flags "${lua_socket_flags} -DUNIX_API=__attribute__((visibility(\"default\")))")
-    set(lua_socket_flags "${lua_socket_flags} -DMIME_API=__attribute__((visibility(\"default\")))")
+    set(lua_socket_flags "-DLUASOCKET_API='__attribute__((visibility(\"default\")))'")
+    set(lua_socket_flags "${lua_socket_flags} -D'UNIX_API=__attribute__((visibility(\"default\")))'")
+    set(lua_socket_flags "${lua_socket_flags} -D'MIME_API=__attribute__((visibility(\"default\")))'")
   endif()
 	set(lua_socket_core_sources
-		${lua_misc_dir}/luasocket/src/luasocket.c
+    ${lua_misc_dir}/luasocket/src/luasocket.c
 		${lua_misc_dir}/luasocket/src/timeout.c
 		${lua_misc_dir}/luasocket/src/buffer.c
 		${lua_misc_dir}/luasocket/src/io.c
@@ -98,23 +123,15 @@ if (pf_build_misc)
 		${lua_misc_dir}/luasocket/src/compat.c
   )
   if (MSVC)
-    set(lua_socket_core_sources "${lua_socket_core_sources} ${lua_misc_dir}/luasocket/src/wsock.c")
+    cxx_lua_library(socket "${lua_socket_flags}" "" ${lua_socket_core_sources} ${lua_misc_dir}/luasocket/src/wsocket.c)
   else()
-    set(lua_socket_core_sources "${lua_socket_core_sources} ${lua_misc_dir}/luasocket/src/usock.c")
+    cxx_lua_library(socket "${lua_socket_flags}" "" ${lua_socket_core_sources} ${lua_misc_dir}/luasocket/src/usocket.c)
   endif()
-  set(lua_socket_serial_sources
-		${lua_misc_dir}/luasocket/src/buffer.c
-		${lua_misc_dir}/luasocket/src/auxiliar.c
-		${lua_misc_dir}/luasocket/src/options.c
-		${lua_misc_dir}/luasocket/src/timeout.c
-		${lua_misc_dir}/luasocket/src/io.c
-		${lua_misc_dir}/luasocket/src/usocket.c
-		${lua_misc_dir}/luasocket/src/serial.c
-  )
   set(lua_socket_mime_sources
     ${lua_misc_dir}/luasocket/src/mime.c
     ${lua_misc_dir}/luasocket/src/compat.c
   )
+  cxx_lua_library(mime "${lua_socket_flags}" "" ${lua_socket_mime_sources})
   if (NOT MSVC)
     set(lua_socket_unix_sources
 			${lua_misc_dir}/luasocket/src/buffer.c
@@ -125,9 +142,29 @@ if (pf_build_misc)
 			${lua_misc_dir}/luasocket/src/usocket.c
 			${lua_misc_dir}/luasocket/src/unix.c
     )
+    #cxx_lua_library(socket_unix "${lua_socket_flags}" ${lua_socket_unix_sources})
+    set(lua_socket_serial_sources
+      ${lua_misc_dir}/luasocket/src/buffer.c
+      ${lua_misc_dir}/luasocket/src/auxiliar.c
+      ${lua_misc_dir}/luasocket/src/options.c
+      ${lua_misc_dir}/luasocket/src/timeout.c
+      ${lua_misc_dir}/luasocket/src/io.c
+      ${lua_misc_dir}/luasocket/src/usocket.c
+      ${lua_misc_dir}/luasocket/src/serial.c
+    )
+    #cxx_lua_library(socket_serial "${lua_socket_flags}" ${lua_socket_serial_sources})
   endif()
-
-
+  if (pf_build_luasql_mysql)
+    if (NOT MSVC)
+      include_directories(/usr/include/mysql/)
+      link_directories(/usr/lib64/mysql)
+    endif()
+    set(lua_sql_mysql_sources
+      ${lua_misc_dir}/luasql/src/ls_mysql.c
+      ${lua_misc_dir}/luasql/src/luasql.c
+    )
+    cxx_lua_library(luasql_mysql "" "mysqlclient" ${lua_sql_mysql_sources})
+  endif()
 endif()
 
 file(GLOB_RECURSE APP_SOURCES "../src/*.cc")

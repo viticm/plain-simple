@@ -38,10 +38,10 @@ function(plainframework_enable_warnings target)
 endfunction()
 
 # Safe add_subdirectory.
-function(add_subdir target target_build)
-  set(old_root_dir ${root_dir} CACHE INTERNAL "root dir cache")
+function(add_subdir target target_build project)
+  set(old_root_dir${project} ${root_dir} CACHE INTERNAL "root dir cache")
   add_subdirectory(${target} ${target_build})
-  set(root_dir ${old_root_dir} CACHE INTERNAL "root dir recover")
+  set(root_dir ${old_root_dir${project}} CACHE INTERNAL "root dir recover")
 endfunction(add_subdir)
 
 # Sets and caches `var` to the first path in 'paths' that exists.

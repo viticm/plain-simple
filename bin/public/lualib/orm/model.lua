@@ -182,7 +182,7 @@ local function connect(settings)
       _connect, err = sql:connect(settings.name)
 
   elseif settings.type == MYSQL then
-      local luasql = require("luasql.mysql")
+      local luasql = require("luasql_mysql")
       sql = luasql.mysql()
       print(settings.name, settings.username, settings.password, settings.host, settings.port)
       _connect, err = sql:connect(settings.name, settings.username, settings.password, settings.host, settings.port)

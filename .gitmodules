@@ -10,3 +10,6 @@
 [submodule "app/misc/lualib-src/luasocket"]
 	path = app/misc/lualib-src/luasocket
 	url = https://github.com/diegonehab/luasocket
+[submodule "dependencies/plain"]
+	path = dependencies/plain
+	url = https://github.com/viticm/plain

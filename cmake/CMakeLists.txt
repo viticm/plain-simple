@@ -26,6 +26,9 @@ endif()
 include("inc/internal_utils.cmake")
 include("inc/common.cmake")
 
+# Build plainframework.
+option(plainframework_build "Build plain framework" ON)
+
 # Options that control the build configuration.
 # To configure PlainFramework flags per build target, see the
 # plainframework_configure_flags() function.
@@ -39,10 +42,19 @@ if (NOT has_output_path)
   # This is the directory into which the librarys are built.
   set(LIBRARY_OUTPUT_PATH ${root_dir}/bin)
 
+  # This flag is the project build as only.
+  set(plain_simple_only 1)
+
   set(has_output_path 1)
 
 endif()
 
+set(plainframework_no_app 1)
+
+if (plainframework_build)
+  add_subdir(${root_dir}/dependencies/plain/cmake plain plain-simple)
+endif()
+
 if(plainframework_build_tests)
-  add_subdir(${root_dir}/app/cmake app)
+  add_subdir(${root_dir}/app/cmake app plain-simple)
 endif()
