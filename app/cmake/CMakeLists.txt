@@ -15,7 +15,7 @@ cmake_minimum_required(VERSION 2.8.12)
 
 option(pf_use_shared "Use plain framework with share library." ON)
 option(pf_build_misc "Build all misc library for app" ON)
-option(pf_build_luasql_mysql "Build luasql for mysql library(need installed mysql client library) " OFF)
+option(pf_build_luasql_mysql "Build luasql for mysql library(need installed mysql client library) " ON)
 
 # Include helper functions and macros used by Google Test.
 config_compiler_and_linker()
@@ -95,14 +95,15 @@ if (pf_build_misc)
   set(lua_misc_dir "${root_dir}/app/misc/lualib-src/")
   if (MSVC)
     set(lua_libs "pf_core;pf_plugin_lua")
+    set(lua_dll_flags "-DLUA_BUILD_AS_DLL")
   endif()
 
-  cxx_lua_library(gbk "" "" ${lua_misc_dir}/lua-gbk/lgbk.c)
-  cxx_lua_library(pb "" "" ${lua_misc_dir}/lua-protobuf/pb.c)
-  cxx_lua_library(lfs "" "" ${lua_misc_dir}/luafilesystem/src/lfs.c)
+  cxx_lua_library(gbk "${lua_dll_flags}" "" ${lua_misc_dir}/lua-gbk/lgbk.c)
+  cxx_lua_library(pb "${lua_dll_flags}" "" ${lua_misc_dir}/lua-protobuf/pb.c)
+  cxx_lua_library(lfs "${lua_dll_flags}" "" ${lua_misc_dir}/luafilesystem/src/lfs.c)
   if (MSVC)
-    set(lua_socket_flags "-D'LUASOCKET_API=__declspec(dllexport)'")
-    set(lua_socket_flags "${lua_socket_flags} -D'MIME_API=__declspec(dllexport)'")
+    set(lua_socket_flags "${lua_dll_flags} -D'LUASOCKET_API=__declspec(dllexport)'")
+    set(lua_socket_flags "${lua_dll_flags} ${lua_socket_flags} -D'MIME_API=__declspec(dllexport)'")
   else()
     set(lua_socket_flags "-DLUASOCKET_API='__attribute__((visibility(\"default\")))'")
     set(lua_socket_flags "${lua_socket_flags} -D'UNIX_API=__attribute__((visibility(\"default\")))'")
@@ -159,11 +160,16 @@ if (pf_build_misc)
       include_directories(/usr/include/mysql/)
       link_directories(/usr/lib64/mysql)
     endif()
-    set(lua_sql_mysql_sources
+    set(luasql_mysql_sources
       ${lua_misc_dir}/luasql/src/ls_mysql.c
       ${lua_misc_dir}/luasql/src/luasql.c
     )
-    cxx_lua_library(luasql_mysql "" "mysqlclient" ${lua_sql_mysql_sources})
+    if (MSVC)
+      set(lua_socket_flags "${lua_dll_flags} -D'LUASQL_API=__declspec(dllexport)'")
+    else()
+      set(lua_socket_flags "${lua_dll_flags}")
+    endif()
+  cxx_lua_library(luasql_mysql "${luasql_flags}" "mysqlclient" ${luasql_mysql_sources})
   endif()
 endif()
 

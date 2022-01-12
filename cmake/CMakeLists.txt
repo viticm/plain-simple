@@ -55,6 +55,9 @@ if (plainframework_build)
   add_subdir(${root_dir}/dependencies/plain/cmake plain plain-simple)
 endif()
 
+# Plian Framework use google test internal_utils(now will use self).
+include("inc/internal_utils.cmake")
+
 if(plainframework_build_tests)
   add_subdir(${root_dir}/app/cmake app plain-simple)
 endif()
