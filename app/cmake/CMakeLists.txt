@@ -78,7 +78,7 @@ endfunction()
 if (pf_build_misc)
 
   if (MSVC)
-    set(lua_flags "${lua_flags} -wd4996")
+    set(lua_flags "${lua_flags} -wd4996 -wd4267 -wd4133")
   endif()
 
   if (NOT lua_dir)
