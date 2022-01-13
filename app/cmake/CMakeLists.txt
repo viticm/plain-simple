@@ -15,7 +15,7 @@ cmake_minimum_required(VERSION 2.8.12)
 
 option(pf_use_shared "Use plain framework with share library." ON)
 option(pf_build_misc "Build all misc library for app" ON)
-option(pf_build_luasql_mysql "Build luasql for mysql library(need installed mysql client library) " ON)
+option(pf_build_luasql_mysql "Build luasql for mysql library(need installed mysql client library) " OFF)
 
 # Include helper functions and macros used by Google Test.
 config_compiler_and_linker()
@@ -173,7 +173,7 @@ if (pf_build_misc)
     else()
       set(lua_socket_flags "${lua_dll_flags}")
     endif()
-  cxx_lua_library(luasql_mysql "${luasql_flags}" "mysqlclient" ${luasql_mysql_sources})
+    cxx_lua_library(luasql_mysql "${luasql_flags}" "mysqlclient" ${luasql_mysql_sources})
   endif()
 endif()
 
