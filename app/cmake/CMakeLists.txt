@@ -70,7 +70,7 @@ function (cxx_lua_library name flags libs)
   cxx_shared_library(${name} "${cxx_base_flags} ${cxx_default} ${flags}" "${lua_libs};${libs}" ${ARGN})
   set_target_properties(${name} PROPERTIES
     PREFIX ""
-    SUFFIX ""
+    DEBUG_POSTFIX ""
     LIBRARY_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}"
     CMAKE_RUNTIME_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}"
   )
