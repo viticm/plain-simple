@@ -97,7 +97,7 @@ if (pf_build_misc)
   set(lua_misc_dir "${root_dir}/app/misc/lualib-src/")
   if (MSVC)
     set(lua_libs "pf_core;pf_plugin_lua")
-    set(lua_flags "-DLUA_BUILD_AS_DLL -wd4996 -wd4267 -wd4133")
+    set(lua_flags "-DLUA_BUILD_AS_DLL -wd4996 -wd4267 -wd4133 -wd4244")
   endif()
 
   cxx_lua_library(gbk "${lua_flags}" "" ${lua_misc_dir}/lua-gbk/lgbk.c)
