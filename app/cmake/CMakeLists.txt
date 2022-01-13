@@ -72,7 +72,9 @@ function (cxx_lua_library name flags libs)
     PREFIX ""
     DEBUG_POSTFIX ""
     LIBRARY_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}"
-    CMAKE_RUNTIME_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}"
+    RUNTIME_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}"
+    ARCHIVE_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}"
+    PDB_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}"
   )
 endfunction()
 
