@@ -68,10 +68,12 @@ endfunction()
 # Add lua library.
 function (cxx_lua_library name flags libs)
   cxx_shared_library(${name} "${cxx_base_flags} ${cxx_default} ${flags}" "${lua_libs};${libs}" ${ARGN})
-  set_target_properties(${name} PROPERTIES PREFIX "")
-  set_target_properties(${name}
-    PROPERTIES
-    LIBRARY_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}")
+  set_target_properties(${name} PROPERTIES
+    PREFIX ""
+    SUFFIX ""
+    LIBRARY_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}"
+    CMAKE_RUNTIME_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}"
+  )
 endfunction()
 
 # Build lua and other libraries.
@@ -109,19 +111,19 @@ if (pf_build_misc)
     set(lua_socket_flags "${lua_socket_flags} -D'UNIX_API=__attribute__((visibility(\"default\")))'")
     set(lua_socket_flags "${lua_socket_flags} -D'MIME_API=__attribute__((visibility(\"default\")))'")
   endif()
-	set(lua_socket_core_sources
+  set(lua_socket_core_sources
     ${lua_misc_dir}/luasocket/src/luasocket.c
-		${lua_misc_dir}/luasocket/src/timeout.c
-		${lua_misc_dir}/luasocket/src/buffer.c
-		${lua_misc_dir}/luasocket/src/io.c
-		${lua_misc_dir}/luasocket/src/auxiliar.c
-		${lua_misc_dir}/luasocket/src/options.c
-		${lua_misc_dir}/luasocket/src/inet.c
-		${lua_misc_dir}/luasocket/src/except.c
-		${lua_misc_dir}/luasocket/src/select.c
-		${lua_misc_dir}/luasocket/src/tcp.c
-		${lua_misc_dir}/luasocket/src/udp.c
-		${lua_misc_dir}/luasocket/src/compat.c
+    ${lua_misc_dir}/luasocket/src/timeout.c
+    ${lua_misc_dir}/luasocket/src/buffer.c
+    ${lua_misc_dir}/luasocket/src/io.c
+    ${lua_misc_dir}/luasocket/src/auxiliar.c
+    ${lua_misc_dir}/luasocket/src/options.c
+    ${lua_misc_dir}/luasocket/src/inet.c
+    ${lua_misc_dir}/luasocket/src/except.c
+    ${lua_misc_dir}/luasocket/src/select.c
+    ${lua_misc_dir}/luasocket/src/tcp.c
+    ${lua_misc_dir}/luasocket/src/udp.c
+    ${lua_misc_dir}/luasocket/src/compat.c
   )
   if (MSVC)
     cxx_lua_library(socket "${lua_socket_flags}" "" ${lua_socket_core_sources} ${lua_misc_dir}/luasocket/src/wsocket.c)
@@ -135,13 +137,13 @@ if (pf_build_misc)
   cxx_lua_library(mime "${lua_socket_flags}" "" ${lua_socket_mime_sources})
   if (NOT MSVC)
     set(lua_socket_unix_sources
-			${lua_misc_dir}/luasocket/src/buffer.c
-			${lua_misc_dir}/luasocket/src/auxiliar.c
-			${lua_misc_dir}/luasocket/src/options.c
-			${lua_misc_dir}/luasocket/src/timeout.c
-			${lua_misc_dir}/luasocket/src/io.c
-			${lua_misc_dir}/luasocket/src/usocket.c
-			${lua_misc_dir}/luasocket/src/unix.c
+      ${lua_misc_dir}/luasocket/src/buffer.c
+      ${lua_misc_dir}/luasocket/src/auxiliar.c
+      ${lua_misc_dir}/luasocket/src/options.c
+      ${lua_misc_dir}/luasocket/src/timeout.c
+      ${lua_misc_dir}/luasocket/src/io.c
+      ${lua_misc_dir}/luasocket/src/usocket.c
+      ${lua_misc_dir}/luasocket/src/unix.c
     )
     #cxx_lua_library(socket_unix "${lua_socket_flags}" ${lua_socket_unix_sources})
     set(lua_socket_serial_sources
@@ -156,8 +158,20 @@ if (pf_build_misc)
     #cxx_lua_library(socket_serial "${lua_socket_flags}" ${lua_socket_serial_sources})
   endif()
   if (pf_build_luasql_mysql)
-    if (NOT MSVC)
-      include_directories(/usr/include/mysql/)
+
+    # The msyql dir.
+    if (NOT mysql_dir)
+      set(mysql_dir ${root_dir}/dependencies/mysql)
+    endif()
+    if (EXISTS ${mysql_dir})
+      include_directories(${root_dir}/dependencies/mysql/include)
+      link_directories(${root_dir}/dependencies/mysql/lib)
+    elseif (MSVC)
+      message(SEND_ERROR "mysql directory not found.")
+    else()
+      # Unix can install mysql devel package.
+      message(WARNING "mysql directory will use by system")
+      include_directories(/usr/include/mysql)
       link_directories(/usr/lib64/mysql)
     endif()
     set(luasql_mysql_sources
