@@ -13,8 +13,6 @@ cmake_minimum_required(VERSION 2.8.12)
 #set_compiler_flags_for_external_libraries()
 #restore_compiler_flags()
 
-option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." ON)
-
 option(pf_use_shared "Use plain framework with share library." ON)
 option(pf_build_misc "Build all misc library for app" ON)
 option(pf_build_luasql_mysql "Build luasql for mysql library(need installed mysql client library) " OFF)
