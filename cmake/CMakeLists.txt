@@ -13,6 +13,7 @@ cmake_minimum_required(VERSION 2.8.12)
 set(PROJECT_NAME PlainFrameworkSimple)
 set(PF_SIMPLE_VERSION 1.0.0)
 set(PROJECT_DESC "Plain framework simple")
+set(pf_force_shared_crt ON)
 
 if (CMAKE_VERSION VERSION_LESS 3.0)
   project(PlainFrameworkSimple CXX C)
