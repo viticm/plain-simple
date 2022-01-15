@@ -81,6 +81,8 @@ endfunction()
 # Build lua and other libraries.
 if (pf_build_misc)
 
+  option(BUILD_SHARED_LIBS "Build shared libraries (DLLs)." ON)
+
   if (NOT lua_dir)
     message(WARNING "can't found the lua directory(use system include)")
   else()
@@ -106,12 +108,12 @@ if (pf_build_misc)
   cxx_lua_library(pb "${lua_flags}" "" ${lua_misc_dir}/lua-protobuf/pb.c)
   cxx_lua_library(lfs "${lua_flags}" "" ${lua_misc_dir}/luafilesystem/src/lfs.c)
   if (MSVC)
-    set(lua_socket_flags "${lua_flags} -D'LUASOCKET_API=__declspec(dllexport)'")
+    set(lua_socket_flags "${lua_flags} -DLUASOCKET_API='__declspec(dllexport)'")
     set(lua_socket_flags "${lua_flags} ${lua_socket_flags} -D'MIME_API=__declspec(dllexport)'")
   else()
     set(lua_socket_flags "-DLUASOCKET_API='__attribute__((visibility(\"default\")))'")
-    set(lua_socket_flags "${lua_socket_flags} -D'UNIX_API=__attribute__((visibility(\"default\")))'")
-    set(lua_socket_flags "${lua_socket_flags} -D'MIME_API=__attribute__((visibility(\"default\")))'")
+    set(lua_socket_flags "${lua_socket_flags} -DUNIX_API='__attribute__((visibility(\"default\")))'")
+    set(lua_socket_flags "${lua_socket_flags} -DMIME_API='__attribute__((visibility(\"default\")))'")
   endif()
   set(lua_socket_core_sources
     ${lua_misc_dir}/luasocket/src/luasocket.c
@@ -181,7 +183,7 @@ if (pf_build_misc)
       ${lua_misc_dir}/luasql/src/luasql.c
     )
     if (MSVC)
-      set(luasql_flags "${lua_flags} -D'LUASQL_API=__declspec(dllexport)'")
+      set(luasql_flags "${lua_flags} -DLUASQL_API='__declspec(dllexport)'")
     else()
       set(luasql_flags "${lua_flags}")
     endif()
