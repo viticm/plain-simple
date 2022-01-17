@@ -67,7 +67,7 @@ endfunction()
 
 # Add lua library.
 function (cxx_lua_library name flags libs)
-  cxx_shared_library(${name} "${cxx_base_flags} ${cxx_default} ${flags}" "${lua_libs};${libs}" ${ARGN})
+  cxx_shared_library(${name} "${cxx_base_flags} ${cxx_default} ${flags}" ${ARGN})
   set_target_properties(${name} PROPERTIES
     PREFIX ""
     DEBUG_POSTFIX ""
@@ -76,6 +76,7 @@ function (cxx_lua_library name flags libs)
     ARCHIVE_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}"
     PDB_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}"
   )
+  target_link_libraries(${name} PUBLIC "${lua_libs};${libs}")
 endfunction()
 
 # Build lua and other libraries.
