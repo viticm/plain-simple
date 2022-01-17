@@ -13,7 +13,6 @@ cmake_minimum_required(VERSION 2.8.12)
 set(PROJECT_NAME PlainFrameworkSimple)
 set(PF_SIMPLE_VERSION 1.0.0)
 set(PROJECT_DESC "Plain framework simple")
-set(pf_force_shared_crt ON)
 
 if (CMAKE_VERSION VERSION_LESS 3.0)
   project(PlainFrameworkSimple CXX C)
@@ -23,10 +22,6 @@ else()
   project(PlainFrameworkSimple VERSION ${PF_SIMPLE_VERSION} LANGUAGES CXX C)
 endif()
 
-# Call fplutil to get locations of dependencies and set common build settings.
-include("inc/internal_utils.cmake")
-include("inc/common.cmake")
-
 # Build plainframework.
 option(plainframework_build "Build plain framework" ON)
 
@@ -35,6 +30,11 @@ option(plainframework_build "Build plain framework" ON)
 # plainframework_configure_flags() function.
 option(plainframework_build_tests "Build PlainFramework unit tests." ON)
 
+# Call fplutil to get locations of dependencies and set common build settings.
+include("inc/internal_utils.cmake")
+include("inc/common.cmake")
+
+# The built output paths.
 if (NOT has_output_path)
 
   # This is the directory into which the executables are built.
@@ -50,6 +50,7 @@ if (NOT has_output_path)
 
 endif()
 
+# Set the plainframework not build app(build by self).
 set(plainframework_no_app 1)
 
 if (plainframework_build)
