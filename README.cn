@@ -25,6 +25,11 @@
 
    怎样在接受数据的时候读取网络包？
 
+4. 关于lua的luasql_mysql模块
+   windows下
+   如果使用了mysql8的mysqlclient静态库，则需要将libcrypto-1_1-x64.dll和
+   libssl-1_1-x64.dll放到程序运行的根目录下
+
 
 Bugs.
  - 1. net/connection/manager/connector.cc 第10行
