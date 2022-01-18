@@ -59,4 +59,4 @@ end
 require_ex("config")
 require_ex("timer")
 require_ex("main")
-require_ex("test")
+-- require_ex("test")
