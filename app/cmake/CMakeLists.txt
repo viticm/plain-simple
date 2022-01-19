@@ -57,6 +57,10 @@ function(test_executable test_name source)
   plainframework_configure_flags(${test_name} ${ARGN})
   plainframework_enable_warnings(${test_name})
   set_target_properties(${test_name} PROPERTIES DEBUG_POSTFIX "d")
+  # Find shared libraries in current directory.
+  if (NOT MSVC)
+    set_target_properties(${test_name} PROPERTIES LINK_FLAGS "-Wl,-rpath,./")
+  endif()
 endfunction()
 
 # Generate a rule to build unit test executables.
@@ -78,6 +82,10 @@ function (cxx_lua_library name flags libs)
     PDB_OUTPUT_DIRECTORY "${LIBRARY_OUTPUT_PATH}/${lua_output_path}"
   )
   target_link_libraries(${name} PUBLIC "${lua_libs};${libs}")
+  # Find shared libraries in current directory.
+  if (NOT MSVC)
+    set_target_properties(${test_name} PROPERTIES LINK_FLAGS "-Wl,-rpath,./")
+  endif()
 endfunction()
 
 # Build lua and other libraries.
